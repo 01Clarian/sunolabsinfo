@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suno Labs - Music Competition on Telegram</title>
+    <meta name="description" content="Compete with your music tracks, vote for winners, and earn SUNO tokens. Join the competition on Telegram now!">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 3rem;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero .cta-button {
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 3rem 0;
+            margin-top: 2rem;
+        }
+
+        .section {
+            padding: 3rem 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* How to Play */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .step {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        .step p {
+            color: var(--gray);
+        }
+
+        /* Prize Structure */
+        .prize-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .prize-card {
+            background: linear-gradient(135deg, var(--light), white);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .prize-card .rank {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .prize-card .percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        /* Rules */
+        .rules-list {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .rule-item {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rule-item h3 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .rule-item p {
+            color: var(--gray);
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .highlight-box h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box .big-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 1rem 0;
+        }
+
+        /* Tiers */
+        .tiers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tier {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tier:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .tier .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier .name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .tier .range {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier .benefit {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🎵 Suno Labs</div>
+                <a href="https://t.me/sunolabs_bot" class="cta-button">Start Playing</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Compete. Vote. Earn.</h1>
+            <p>The ultimate music competition on Telegram powered by SUNO tokens</p>
+            <a href="https://t.me/sunolabs_bot" class="cta-button">Join Competition Now →</a>
+        </div>
+    </section>
+
+    <div class="content">
+        <div class="container">
+            <!-- How It Works -->
+            <section class="section">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Choose Your Path</h3>
+                        <p>Upload a track to compete OR join as a voter to earn rewards</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Buy SUNO Tokens</h3>
+                        <p>Minimum 0.01 SOL entry. Higher tier = Better rewards & multipliers</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Submit & Vote</h3>
+                        <p>5 minutes to join, then vote for your favorite track during voting phase</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Win Prizes</h3>
+                        <p>Top 5 tracks win prizes. Voters who pick the winner share rewards!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prize Distribution -->
+            <section class="section">
+                <h2 class="section-title">Prize Distribution</h2>
+                <div class="prize-grid">
+                    <div class="prize-card">
+                        <div class="rank">🥇 1st Place</div>
+                        <div class="percentage">40%</div>
+                        <p>of the 80% prize pool</p>
+                    </div>
+                    <div class="prize-card">
+                        <div class="rank">🥈 2nd Place</div>
+                        <div class="percentage">25%</div>
+                        <p>of the 80% prize pool</p>
+                    </div>
+                    <div class="prize-card">
+                        <div class="rank">🥉 3rd Place</div>
+                        <div class="percentage">20%</div>
+                        <p>of the 80% prize pool</p>
+                    </div>
+                    <div class="prize-card">
+                        <div class="rank">🏅 4th Place</div>
+                        <div class="percentage">10%</div>
+                        <p>of the 80% prize pool</p>
+                    </div>
+                    <div class="prize-card">
+                        <div class="rank">🎖️ 5th Place</div>
+                        <div class="percentage">5%</div>
+                        <p>of the 80% prize pool</p>
+                    </div>
+                    <div class="prize-card">
+                        <div class="rank">🗳️ Voters</div>
+                        <div class="percentage">20%</div>
+                        <p>Split among voters who picked winner</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🎰 Bonus Prize System</h3>
+                    <p>Every round has a chance to win a MASSIVE bonus!</p>
+                    <div class="big-number">1/500</div>
+                    <p>Bonus prize amount scales with treasury size (2%-20%)</p>
+                    <p style="margin-top: 1rem; opacity: 0.9;">The bigger the treasury, the bigger the bonus prize potential!</p>
+                </div>
+            </section>
+
+            <!-- Entry Tiers -->
+            <section class="section">
+                <h2 class="section-title">Entry Tiers</h2>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">Higher investment = Better retention & prize multipliers</p>
+                <div class="tiers">
+                    <div class="tier">
+                        <div class="icon">🎵</div>
+                        <div class="name">Basic</div>
+                        <div class="range">0.01 - 0.049 SOL</div>
+                        <div class="benefit">50% retention<br>1.0x multiplier</div>
+                    </div>
+                    <div class="tier">
+                        <div class="icon">💎</div>
+                        <div class="name">Mid Tier</div>
+                        <div class="range">0.05 - 0.099 SOL</div>
+                        <div class="benefit">55% retention<br>1.05x multiplier</div>
+                    </div>
+                    <div class="tier">
+                        <div class="icon">👑</div>
+                        <div class="name">High Tier</div>
+                        <div class="range">0.10 - 0.499 SOL</div>
+                        <div class="benefit">60% retention<br>1.10x multiplier</div>
+                    </div>
+                    <div class="tier">
+                        <div class="icon">🐋</div>
+                        <div class="name">Whale</div>
+                        <div class="range">0.50+ SOL</div>
+                        <div class="benefit">65-75% retention<br>1.15-1.50x multiplier</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How Money Flows -->
+            <section class="section">
+                <h2 class="section-title">How Money Flows</h2>
+                <div class="rules-list">
+                    <div class="rule-item">
+                        <h3>📥 Your Entry</h3>
+                        <p>You buy SUNO tokens (minimum 0.01 SOL). After 10% Solana transaction fee, your tier determines retention rate.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>💰 65% → Round Prize Pool</h3>
+                        <p>Goes to the current round's winners (distributed 80/20 between top 5 tracks and voters)</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🏦 35% → Permanent Treasury</h3>
+                        <p>Saved forever and grows perpetually. Only used for the 1/500 bonus prize drawings.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🎁 Your SUNO Tokens</h3>
+                        <p>Sent to your wallet immediately based on your tier's retention rate. These are yours to keep!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rules -->
+            <section class="section">
+                <h2 class="section-title">Game Rules</h2>
+                <div class="rules-list">
+                    <div class="rule-item">
+                        <h3>🎵 Track Requirements</h3>
+                        <p>Accepted formats: MP3, M4A, OGG, WAV, FLAC, AAC. One track per user per round.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>⏰ Timing</h3>
+                        <p>5 minutes to submit tracks. Voting duration is dynamic based on total track length (sum of all tracks + 1 minute).</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🗳️ Voting</h3>
+                        <p>Only voters who voted for the WINNER share the 20% voter pool. Split proportionally by contribution amount.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🏆 Winning</h3>
+                        <p>Top 5 tracks with most votes win. Your tier multiplier applies to your prize. Ties split the prize.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🎰 Bonus Prize</h3>
+                        <p>1 in 500 chance every round. First place winner gets the bonus added to their prize. Bonus amount is 2-20% of permanent treasury.</p>
+                    </div>
+                    <div class="rule-item">
+                        <h3>🔄 Continuous Rounds</h3>
+                        <p>New rounds start automatically. Prize pool starts fresh each round, but permanent treasury keeps growing!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Voter Strategy -->
+            <section class="section">
+                <h2 class="section-title">Voter Strategy</h2>
+                <div class="highlight-box">
+                    <h3>💡 How to Maximize Voter Earnings</h3>
+                    <p style="margin-top: 1rem;">Vote for who you think will WIN, not just who you like</p>
+                    <p style="margin-top: 1rem;">Higher tier entry = Bigger share of voter rewards (if you pick the winner)</p>
+                    <p style="margin-top: 1rem;">Only voters who picked the WINNER get paid</p>
+                    <p style="margin: 1.5rem 0 0.5rem; font-weight: 600;">Example:</p>
+                    <p style="font-size: 0.95rem; opacity: 0.9;">If 3 voters picked the winner and contributed 100, 50, and 50 SUNO respectively, they split the voter pool 50%, 25%, 25%</p>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="section" style="text-align: center; padding: 4rem 0;">
+                <h2 class="section-title">Ready to Compete?</h2>
+                <p style="font-size: 1.25rem; color: var(--gray); margin-bottom: 2rem;">Join thousands of music creators and voters earning SUNO tokens</p>
+                <a href="https://t.me/sunolabs_bot" class="cta-button" style="font-size: 1.25rem; padding: 1rem 2.5rem;">Start Playing Now →</a>
+                <p style="margin-top: 2rem; color: var(--gray);">Main Channel: <a href="https://t.me/sunolabs" style="color: var(--primary);">@sunolabs</a></p>
+                <p style="color: var(--gray);">Submissions: <a href="https://t.me/sunolabs_submissions" style="color: var(--primary);">@sunolabs_submissions</a></p>
+            </section>
+
+            <!-- Disclaimer -->
+            <section class="section" style="background: var(--light); padding: 2rem; border-radius: 15px; margin: 2rem 0;">
+                <h3 style="font-size: 1.25rem; color: var(--dark); margin-bottom: 1rem; text-align: center;">⚠️ Disclaimer</h3>
+                <p style="font-size: 0.9rem; color: var(--gray); line-height: 1.8; text-align: center; max-width: 900px; margin: 0 auto;">
+                    Suno Labs is a decentralized entertainment platform. We are not financial advisors. Participation involves cryptocurrency transactions which carry inherent risks including loss of funds. All transactions are final and non-refundable. SUNO tokens have no guaranteed value. Users participate at their own risk. We make no guarantees regarding prizes, payouts, or token value. By participating, you acknowledge that you are solely responsible for any tax obligations in your jurisdiction. You must be 18+ and comply with all local laws. We are not liable for any losses, damages, technical issues, or disputes arising from use of this platform. No warranty is provided, express or implied. Use at your own risk.
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Suno Labs. All rights reserved.</p>
+            <p style="margin-top: 0.5rem; opacity: 0.7;">Built on Solana | Powered by SUNO Token</p>
+            <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.6;">
+                Use at your own risk. All transactions are final. We are not liable for any losses or damages.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
